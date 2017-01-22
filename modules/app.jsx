@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router'
 
 import Profile from './profile.jsx'
+import History from './history.jsx'
 
 class App extends React.Component {
     constructor(props) {
@@ -26,9 +27,8 @@ const Login = (props) => <div>
 </div>
 
 const Callback = (props) => <div>
-    {/* <h1>Callback!</h1> */}
-    {/* <h2>{props.params.id}</h2> */}
     <Profile token={props.params.id} />
+    <History token={props.params.id} />
 </div>
 
 const NotFound = () => (
