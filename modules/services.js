@@ -4,10 +4,13 @@ var Services = class Services {
         this.apiURL = url;
     }
 
-    get(dataSource) {
+    get(dataSource, attr) {
         let buildURL = this.apiURL + dataSource;
         buildURL += '?oauth_token=' + this.token;
         buildURL += '&v=20170121';
+        if (attr) {
+            buildURL += '&v=20170121'+attr;
+        }
 
         const myInit = {
             method: 'GET'
