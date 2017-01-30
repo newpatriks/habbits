@@ -1,13 +1,16 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import d3 from 'd3'
 
 import Services from './services'
+import Piechart from './piechart/piechart.jsx'
 
 class History extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             token: '',
+            categories: {},
             checkins: {
                 count: 0,
                 items: []
@@ -22,7 +25,7 @@ class History extends React.Component {
             .then(json => {
                 let allCheckins = itemCheckins.concat(json.response.checkins.items);
                 this.offset+=250;
-                // if (allCheckins.length >= json.response.checkins.count || this.offset > 500) {
+                // if (this.offset > 300) {
                 if (json.response.checkins.items.length === 0) {
                     clearInterval(this.state.intervalId);
                     return;
@@ -65,6 +68,7 @@ class History extends React.Component {
 
     parseData() {
         if (this.state.checkins.items) {
+            console.log(this.state.checkins);
             if (this.state.checkins.items.length > 0) {
                 let lastCheckin = this.state.checkins.items[0];
                 let firstCheckin = this.state.checkins.items[this.state.checkins.items.length - 1];
@@ -76,6 +80,21 @@ class History extends React.Component {
                 lastCheckinDate.setUTCSeconds(lastCheckin.createdAt);
                 firstCheckinDate.setUTCSeconds(firstCheckin.createdAt);
 
+                let myCategories = this.state.categories;
+                this.state.checkins.items.forEach(function(checkin) {
+                    let checkinCategories = checkin.venue.categories;
+                    checkinCategories.forEach(function(category) {
+                        if (!myCategories[category.id]) {
+                            myCategories[category.id] = {
+                                value: 1,
+                                label: category.name
+                            };
+                        } else {
+                            myCategories[category.id].value += 1;
+                        }
+                    });
+                });
+
                 this.setState({
                     lastPlace: lastVenue.name,
                     firstPlace: firstVenue.name,
@@ -86,7 +105,8 @@ class History extends React.Component {
                     firstDate: firstCheckinDate,
                     firstDay: firstCheckinDate.getDate(),
                     firstYear: firstCheckinDate.getFullYear(),
-                    firstMonth: this.parseMonth(firstCheckinDate)
+                    firstMonth: this.parseMonth(firstCheckinDate),
+                    categories: myCategories
                 });
             }
         }
@@ -104,6 +124,12 @@ class History extends React.Component {
                 {/* <h1>Your last checkin was in {this.state.lastPlace} on {this.state.data}, {this.state.monthWord} {this.state.day} of {this.state.year}</h1> */}
                 <h1>Last checkin was in {this.state.lastPlace} on {this.state.month} {this.state.day}, {this.state.year}</h1>
                 <h1>First checkin was in {this.state.firstPlace} on {this.state.firstMonth} {this.state.firstDay}, {this.state.firstYear}</h1>
+                <svg width={800} height={400}>
+                    <Piechart x={300} y={100} outerRadius={100} innerRadius={50}
+                    data={[{value: 92-34, label: 'Code lines'}, {value: 34, label: 'Empty lines'}]}
+                    categories={this.state.categories}/>
+                </svg>
+
             </div>
         );
     }
