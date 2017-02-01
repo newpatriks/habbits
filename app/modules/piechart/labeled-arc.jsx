@@ -17,4 +17,4 @@ class LabeledArc extends Arc {
     }
 }
 
-export default LabeledArc;
+export { LabeledArc };

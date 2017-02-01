@@ -19,32 +19,40 @@ class History extends React.Component {
     }
 
     getInfiniteData() {
-        let itemCheckins = this.state.checkins.items || [];
+        let itemCheckins = this.state.checkins.items || [],
+            allCheckins;
+
         this.checkinsService.get('users/self/checkins','&offset='+this.offset+'&limit=250')
             .then(response => response.json())
             .then(json => {
-                let allCheckins = itemCheckins.concat(json.response.checkins.items);
-                this.offset+=250;
-                // if (this.offset > 300) {
-                if (json.response.checkins.items.length === 0) {
-                    clearInterval(this.state.intervalId);
-                    return;
-                }
-                console.log(allCheckins.length, json.response.checkins.count);
+                allCheckins = itemCheckins.concat(json.response.checkins.items);
                 this.setState({
                     checkins: {
                         items: allCheckins,
                         count: json.response.checkins.count
                     }
                 }, this.parseData);
+
+                this.offset+=250;
+                console.log(allCheckins.length, json.response.checkins.count);
+
+                if (this.offset > 300) {
+                    // if (json.response.checkins.items.length === 0) {
+                    clearInterval(this.state.intervalId);
+                    return;
+                }
             });
     }
 
     getData() {
-        this.checkinsService = new Services('https://api.foursquare.com/v2/', this.props.token);
         let that = this;
+        let intervalId;
+
+        this.checkinsService = new Services('https://api.foursquare.com/v2/', this.props.token);
         this.offset = 0;
-        let intervalId = setInterval(function() {
+        // this.getInfiniteData();
+        // this.offset +=250;
+        intervalId = setInterval(function() {
             that.getInfiniteData();
         }, 1500);
         this.setState({intervalId: intervalId});
@@ -70,6 +78,8 @@ class History extends React.Component {
         if (this.state.checkins.items) {
             console.log(this.state.checkins);
             if (this.state.checkins.items.length > 0) {
+                // this.checkinsService.update(this.userId, {checkins: this.state.checkins});
+
                 let lastCheckin = this.state.checkins.items[0];
                 let firstCheckin = this.state.checkins.items[this.state.checkins.items.length - 1];
                 let firstVenue = firstCheckin.venue;
@@ -82,17 +92,19 @@ class History extends React.Component {
 
                 let myCategories = this.state.categories;
                 this.state.checkins.items.forEach(function(checkin) {
-                    let checkinCategories = checkin.venue.categories;
-                    checkinCategories.forEach(function(category) {
-                        if (!myCategories[category.id]) {
-                            myCategories[category.id] = {
-                                value: 1,
-                                label: category.name
-                            };
-                        } else {
-                            myCategories[category.id].value += 1;
-                        }
-                    });
+                    if (checkin.venue && checkin.venue.categories && checkin.venue.categories.length > 0) {
+                        let checkinCategories = checkin.venue.categories;
+                        checkinCategories.forEach(function(category) {
+                            if (!myCategories[category.id]) {
+                                myCategories[category.id] = {
+                                    value: 1,
+                                    label: category.name
+                                };
+                            } else {
+                                myCategories[category.id].value += 1;
+                            }
+                        });
+                    }
                 });
 
                 this.setState({

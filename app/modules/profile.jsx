@@ -17,6 +17,7 @@ class Profile extends React.Component {
 
     componentWillMount() {
         // get the data?
+        var that = this;
         this.setState({
             token: this.props.token
         });
@@ -26,6 +27,7 @@ class Profile extends React.Component {
             .then(response => response.json())
             .then(json => {
                 // console.log(json.response.user);
+                selfService.createUser(json.response.user);
                 this.setState({
                     userBio: json.response.user,
                     profileImg: json.response.user.photo.prefix + 'width300' + json.response.user.photo.suffix
