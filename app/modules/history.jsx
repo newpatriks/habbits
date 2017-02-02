@@ -9,6 +9,7 @@ class History extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            userId: '',
             token: '',
             categories: {},
             checkins: {
@@ -61,6 +62,7 @@ class History extends React.Component {
     componentWillMount() {
         this.setState({
             token: this.props.token,
+            userId: this.props.userId,
             checkins: {
                 count: 0,
                 items: []
@@ -75,10 +77,11 @@ class History extends React.Component {
     }
 
     parseData() {
+        console.log('>> this.state.userId >> ', this.state.userId);
         if (this.state.checkins.items) {
             console.log(this.state.checkins);
             if (this.state.checkins.items.length > 0) {
-                // this.checkinsService.update(this.userId, {checkins: this.state.checkins});
+                this.checkinsService.update(this.state.userId, this.state.checkins.items);
 
                 let lastCheckin = this.state.checkins.items[0];
                 let firstCheckin = this.state.checkins.items[this.state.checkins.items.length - 1];
@@ -126,7 +129,8 @@ class History extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         this.setState({
-            token: nextProps.token
+            token: nextProps.token,
+            userId: nextProps.userId
         });
     }
 

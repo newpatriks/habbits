@@ -20,10 +20,6 @@ var Services = class Services {
     }
 
     createUser(data) {
-
-        console.log('Service >> create user', data);
-        console.log('----------------------------------');
-
         $.ajax({
             type: "POST",
             url: this.apiURL + 'profile',
@@ -32,23 +28,19 @@ var Services = class Services {
                 console.log(res);
             }
         });
-
-        // fetch(this.apiURL + 'profile', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Accept': 'application/json, application/xml, text/plain, text/html, *.*',
-        //         'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
-        //     },
-        //     body: JSON.stringify( data )
-        // })
-        // .then(function(res) {
-        //     console.log(res);
-        // });
-
     }
 
     update(id, data) {
-
+        console.log(id, data);
+        // console.log('---------------------------------');
+        $.ajax({
+            type: "POST",
+            url: this.apiURL + 'checkins',
+            data: {id: id, data: data},
+            success: function(res) {
+                console.log(res);
+            }
+        });
     }
 };
 

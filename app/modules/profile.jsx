@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom'
 import Services from './services'
 import Picture from './picture.jsx'
 import ProfileInfo from './profile-info.jsx'
+import History from './history.jsx'
 
 class Profile extends React.Component {
     constructor(props) {
@@ -40,6 +41,7 @@ class Profile extends React.Component {
             <div>
                 <ProfileInfo data={this.state.userBio} />
                 <Picture image={this.state.profileImg}/>
+                <History token={this.state.token} userId={this.state.userBio.id} />
             </div>
         );
     }
