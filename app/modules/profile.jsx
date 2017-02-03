@@ -12,7 +12,8 @@ class Profile extends React.Component {
         this.state = {
             token: '',
             userBio: {},
-            profileImg: ''
+            profileImg: '',
+            exists: null
         };
     }
 
@@ -27,12 +28,27 @@ class Profile extends React.Component {
         selfService.get('users/self')
             .then(response => response.json())
             .then(json => {
-                // console.log(json.response.user);
-                selfService.createUser(json.response.user);
-                this.setState({
-                    userBio: json.response.user,
-                    profileImg: json.response.user.photo.prefix + 'width300' + json.response.user.photo.suffix
-                });
+                console.log('0');
+                selfService.checkUser(json.response.user.id)
+                    .then(res => res.json())
+                    .then(checkUsrResponse => {
+                        if (typeof(checkUsrResponse.data) === 'object') {
+                            this.setState({
+                                foursquareId: json.response.user.id,
+                                exists: true,
+                                userBio: checkUsrResponse.data,
+                                profileImg: checkUsrResponse.picture
+                            });
+                        } else {
+                            selfService.createUser(json.response.user);
+                            this.setState({
+                                exists: false,
+                                foursquareId: json.response.user.id,
+                                userBio: json.response.user,
+                                profileImg: json.response.user.photo.prefix + 'width300' + json.response.user.photo.suffix
+                            });
+                        }
+                    });
             });
     }
 
@@ -41,7 +57,7 @@ class Profile extends React.Component {
             <div>
                 <ProfileInfo data={this.state.userBio} />
                 <Picture image={this.state.profileImg}/>
-                <History token={this.state.token} userId={this.state.userBio.id} />
+                <History token={this.state.token} foursquareId={this.state.foursquareId} exists={this.state.exists}/>
             </div>
         );
     }

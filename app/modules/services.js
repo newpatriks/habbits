@@ -32,7 +32,6 @@ var Services = class Services {
 
     update(id, data) {
         console.log(id, data);
-        // console.log('---------------------------------');
         $.ajax({
             type: "POST",
             url: this.apiURL + 'checkins',
@@ -41,6 +40,14 @@ var Services = class Services {
                 console.log(res);
             }
         });
+    }
+
+    checkUser(id) {
+        return fetch(this.apiURL + 'user/' + id, {method: 'GET'});
+    }
+
+    getUserCheckins(id) {
+        return fetch(this.apiURL + 'user-checkins/' + id, {method: 'GET'});
     }
 };
 

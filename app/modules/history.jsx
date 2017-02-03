@@ -9,7 +9,8 @@ class History extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            userId: '',
+            exists: null,
+            foursquareId: '',
             token: '',
             categories: {},
             checkins: {
@@ -35,7 +36,7 @@ class History extends React.Component {
                 }, this.parseData);
 
                 this.offset+=250;
-                console.log(allCheckins.length, json.response.checkins.count);
+                // console.log(allCheckins.length, json.response.checkins.count);
 
                 if (this.offset > 300) {
                     // if (json.response.checkins.items.length === 0) {
@@ -45,30 +46,39 @@ class History extends React.Component {
             });
     }
 
+    getLocalUserData() {
+        this.checkinsService = new Services();
+        this.checkinsService.getUserCheckins(this.state.foursquareId)
+            .then(response => response.json())
+            .then(checkinsJson => {
+                console.log(checkinsJson.data);
+                this.setState({
+                    checkins: {
+                        items: checkinsJson.data,
+                        count: checkinsJson.data.length
+                    }
+                }, this.parseData);
+            });
+    }
+
     getData() {
         let that = this;
         let intervalId;
 
-        this.checkinsService = new Services('https://api.foursquare.com/v2/', this.props.token);
-        this.offset = 0;
-        // this.getInfiniteData();
-        // this.offset +=250;
-        intervalId = setInterval(function() {
-            that.getInfiniteData();
-        }, 1500);
-        this.setState({intervalId: intervalId});
-    }
+        if (this.state.exists) {
+            console.log('THIS USER EXIST! BOOOM!!');
+            this.getLocalUserData();
+        } else {
+            this.checkinsService = new Services('https://api.foursquare.com/v2/', this.props.token);
+            this.offset = 0;
+            // this.getInfiniteData();
+            // this.offset +=250;
+            intervalId = setInterval(function() {
+                that.getInfiniteData();
+            }, 1500);
+            this.setState({intervalId: intervalId});
+        }
 
-    componentWillMount() {
-        this.setState({
-            token: this.props.token,
-            userId: this.props.userId,
-            checkins: {
-                count: 0,
-                items: []
-            }
-        });
-        this.getData();
     }
 
     parseMonth(d) {
@@ -77,11 +87,11 @@ class History extends React.Component {
     }
 
     parseData() {
-        console.log('>> this.state.userId >> ', this.state.userId);
+        // console.log('>> this.state.foursquareId >> ', this.state.foursquareId);
         if (this.state.checkins.items) {
-            console.log(this.state.checkins);
+            // console.log(this.state.checkins);
             if (this.state.checkins.items.length > 0) {
-                this.checkinsService.update(this.state.userId, this.state.checkins.items);
+                this.checkinsService.update(this.state.foursquareId, this.state.checkins.items);
 
                 let lastCheckin = this.state.checkins.items[0];
                 let firstCheckin = this.state.checkins.items[this.state.checkins.items.length - 1];
@@ -127,10 +137,27 @@ class History extends React.Component {
         }
     }
 
+    componentWillMount() {
+        this.setState({
+            token: this.props.token,
+            foursquareId: this.props.foursquareId,
+            checkins: {
+                count: 0,
+                items: []
+            }
+        });
+    }
+
     componentWillReceiveProps(nextProps) {
+        console.log('>> componentWillReceiveProps', nextProps);
         this.setState({
             token: nextProps.token,
-            userId: nextProps.userId
+            foursquareId: nextProps.foursquareId,
+            exists: nextProps.exists
+        }, function() {
+            if (this.props.exists !== null) {
+                this.getData();
+            }
         });
     }
 
