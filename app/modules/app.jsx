@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router'
 
 import Profile from './profile.jsx'
+import Login from './login.jsx'
 
 class App extends React.Component {
     constructor(props) {
@@ -14,15 +15,15 @@ class App extends React.Component {
     render() {
         return(
             <Router history={hashHistory}>
-                <Route path='/' component={Login} />
+                <Route path='/' component={LoginComponent} />
                 <Route path='/callback/:id' component={Callback} />
             </Router>
         );
     }
 };
 
-const Login = (props) => <div>
-    <a href="http://localhost:9000/api/login/">Login</a>
+const LoginComponent = (props) => <div>
+    <Login />
 </div>
 
 const Callback = (props) => <div>
