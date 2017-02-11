@@ -25,19 +25,18 @@ var Services = class Services {
             url: this.apiURL + 'profile',
             data: data,
             success: function(res) {
-                console.log(res);
+                // console.log(res);
             }
         });
     }
 
     update(id, data) {
-        console.log(id, data);
-        $.ajax({
+        return $.ajax({
             type: "POST",
             url: this.apiURL + 'checkins',
             data: {id: id, data: data},
             success: function(res) {
-                console.log(res);
+                // console.log(res);
             }
         });
     }

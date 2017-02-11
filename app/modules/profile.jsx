@@ -28,24 +28,24 @@ class Profile extends React.Component {
         selfService.get('users/self')
             .then(response => response.json())
             .then(json => {
-                console.log('0');
                 selfService.checkUser(json.response.user.id)
                     .then(res => res.json())
                     .then(checkUsrResponse => {
-                        if (typeof(checkUsrResponse.data) === 'object') {
-                            this.setState({
-                                foursquareId: json.response.user.id,
-                                exists: true,
-                                userBio: checkUsrResponse.data,
-                                profileImg: checkUsrResponse.picture
-                            });
-                        } else {
+                        // console.log('RESPONSE >> ', checkUsrResponse.data);
+                        if (!checkUsrResponse.data) {
                             selfService.createUser(json.response.user);
                             this.setState({
                                 exists: false,
                                 foursquareId: json.response.user.id,
                                 userBio: json.response.user,
                                 profileImg: json.response.user.photo.prefix + 'width300' + json.response.user.photo.suffix
+                            });
+                        } else if (typeof(checkUsrResponse.data) === 'object') {
+                            this.setState({
+                                foursquareId: json.response.user.id,
+                                exists: true,
+                                userBio: checkUsrResponse.data,
+                                profileImg: checkUsrResponse.picture
                             });
                         }
                     });

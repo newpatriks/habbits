@@ -18,29 +18,35 @@ class History extends React.Component {
                 items: []
             }
         };
+        this.handleClick = this.handleClick.bind(this); // we need this if we want to use THIS inside handleClick
+    }
+    handleClick() {
+        this.synchronyzeCheckins();
     }
 
     getInfiniteData() {
         let itemCheckins = this.state.checkins.items || [],
-            allCheckins;
+            that = this,
+            allCheckins = [];
 
         this.checkinsService.get('users/self/checkins','&offset='+this.offset+'&limit=250')
             .then(response => response.json())
             .then(json => {
                 allCheckins = itemCheckins.concat(json.response.checkins.items);
-                this.setState({
+
+                that.setState({
                     checkins: {
                         items: allCheckins,
                         count: json.response.checkins.count
                     }
-                }, this.parseData);
+                }, that.parseData);
 
-                this.offset+=250;
+                that.offset+=250;
                 // console.log(allCheckins.length, json.response.checkins.count);
 
-                if (this.offset > 300) {
+                if (that.offset > 300) {
                     // if (json.response.checkins.items.length === 0) {
-                    clearInterval(this.state.intervalId);
+                    clearInterval(that.state.intervalId);
                     return;
                 }
             });
@@ -48,10 +54,13 @@ class History extends React.Component {
 
     getLocalUserData() {
         this.checkinsService = new Services();
+
         this.checkinsService.getUserCheckins(this.state.foursquareId)
             .then(response => response.json())
             .then(checkinsJson => {
+                console.log('USER DATA (LOCAL)');
                 console.log(checkinsJson.data);
+                console.log('-----------------------------------------');
                 this.setState({
                     checkins: {
                         items: checkinsJson.data,
@@ -61,14 +70,36 @@ class History extends React.Component {
             });
     }
 
-    getData() {
+    synchronyzeCheckins() {
+        console.log(this.state.checkins.items);
+        let allCheckins = this.state.checkins.items,
+            newestCheckinLocal = allCheckins[0],
+            that = this;
+
+        this.checkinsService = new Services('https://api.foursquare.com/v2/', this.props.token);
+        this.checkinsService.get('users/self/checkins','&offset=0&limit=250&afterTimestamp='+newestCheckinLocal.createdAt + 100)
+            .then(response => response.json())
+            .then(json => {
+                let checkinList = json.response.checkins.items;
+                if (checkinList.length > 0) {
+                    // update with new checkins
+                    allCheckins = json.response.checkins.items.concat(allCheckins);
+                    this.checkinsService.update(that.state.foursquareId, allCheckins)
+                        .then(() => {
+                            that.setState({
+                                checkins: allCheckins
+                            }, that.parseData);
+                        });
+                }
+
+            });
+    }
+
+    handlesDataOrigin() {
         let that = this;
         let intervalId;
 
-        if (this.state.exists) {
-            console.log('THIS USER EXIST! BOOOM!!');
-            this.getLocalUserData();
-        } else {
+        if (this.state.exists === false) {
             this.checkinsService = new Services('https://api.foursquare.com/v2/', this.props.token);
             this.offset = 0;
             // this.getInfiniteData();
@@ -77,8 +108,10 @@ class History extends React.Component {
                 that.getInfiniteData();
             }, 1500);
             this.setState({intervalId: intervalId});
+        } else {
+            console.log('THIS USER EXIST!');
+            this.getLocalUserData();
         }
-
     }
 
     parseMonth(d) {
@@ -87,9 +120,7 @@ class History extends React.Component {
     }
 
     parseData() {
-        // console.log('>> this.state.foursquareId >> ', this.state.foursquareId);
         if (this.state.checkins.items) {
-            // console.log(this.state.checkins);
             if (this.state.checkins.items.length > 0) {
                 this.checkinsService.update(this.state.foursquareId, this.state.checkins.items);
 
@@ -149,14 +180,14 @@ class History extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log('>> componentWillReceiveProps', nextProps);
+        // console.log('>> componentWillReceiveProps', nextProps);
         this.setState({
             token: nextProps.token,
             foursquareId: nextProps.foursquareId,
             exists: nextProps.exists
         }, function() {
             if (this.props.exists !== null) {
-                this.getData();
+                this.handlesDataOrigin();
             }
         });
     }
@@ -172,7 +203,7 @@ class History extends React.Component {
                     data={[{value: 92-34, label: 'Code lines'}, {value: 34, label: 'Empty lines'}]}
                     categories={this.state.categories}/>
                 </svg>
-
+                <button onClick={this.handleClick}>Update checkins</button>
             </div>
         );
     }

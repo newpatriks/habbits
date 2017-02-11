@@ -15,9 +15,12 @@ class ProfileInfo extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({
-            profile: nextProps.data
-        });
+        if (nextProps.data) {
+            this.setState({
+                profile: nextProps.data
+            });
+            // console.log('>> ', nextProps);
+        }
     }
 
     render() {
