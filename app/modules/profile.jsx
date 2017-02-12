@@ -45,7 +45,7 @@ class Profile extends React.Component {
                                 foursquareId: json.response.user.id,
                                 exists: true,
                                 userBio: checkUsrResponse.data,
-                                profileImg: checkUsrResponse.picture
+                                profileImg: checkUsrResponse.data.picture
                             });
                         }
                     });
@@ -55,8 +55,8 @@ class Profile extends React.Component {
     render() {
         return(
             <div>
-                <ProfileInfo data={this.state.userBio} />
-                <Picture image={this.state.profileImg}/>
+                <ProfileInfo data={this.state.userBio} className=""/>
+                <Picture image={this.state.profileImg} className=""/>
                 <History token={this.state.token} foursquareId={this.state.foursquareId} exists={this.state.exists}/>
             </div>
         );

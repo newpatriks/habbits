@@ -195,9 +195,9 @@ class History extends React.Component {
     render() {
         return(
             <div>
-                {/* <h1>Your last checkin was in {this.state.lastPlace} on {this.state.data}, {this.state.monthWord} {this.state.day} of {this.state.year}</h1> */}
-                <h1>Last checkin was in {this.state.lastPlace} on {this.state.month} {this.state.day}, {this.state.year}</h1>
-                <h1>First checkin was in {this.state.firstPlace} on {this.state.firstMonth} {this.state.firstDay}, {this.state.firstYear}</h1>
+                {/* <p>Your last checkin was in {this.state.lastPlace} on {this.state.data}, {this.state.monthWord} {this.state.day} of {this.state.year}</p> */}
+                <p>Last checkin was in {this.state.lastPlace} on {this.state.month} {this.state.day}, {this.state.year}</p>
+                <p>First checkin was in {this.state.firstPlace} on {this.state.firstMonth} {this.state.firstDay}, {this.state.firstYear}</p>
                 <svg width={800} height={400}>
                     <Piechart x={300} y={100} outerRadius={100} innerRadius={50}
                     data={[{value: 92-34, label: 'Code lines'}, {value: 34, label: 'Empty lines'}]}

@@ -9,7 +9,7 @@ class Picture extends React.Component {
     render() {
         return(
             <div>
-                <img src={this.props.image} />
+                <img className="" src={this.props.image} />
             </div>
         );
     }

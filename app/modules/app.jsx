@@ -22,7 +22,9 @@ class App extends React.Component {
     }
 };
 
-const LoginComponent = (props) => <div>
+const LoginComponent = (props) => <div className="home--container">
+    <h1>Habits</h1>
+    <h2 className="subtitle">Lorem ipsum dolor sit amet, volutpat lorem eget vivamus luctus fusce justo. Nulla maecenas dictum rutrum. Tincidunt ad eget magni ipsum morbi, id ante vulputate elit mauris tortor nulla, ultricies tellus habitasse sit pede amet eget</h2>
     <Login />
 </div>
 

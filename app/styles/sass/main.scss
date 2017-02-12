@@ -1,10 +1,44 @@
-$bg-color: #333;
+@import 'palette';
+
+$font-size-xxl: 100px;
+$font-size-xl: 30px;
+$font-size-l: 20px;
+$font-size-m: 14px;
+$font-size-s: 10px;
+$font-size-xs: 8px;
 
 body {
-    position: relative; 
+    position: relative;
+    font-family: 'Poppins', sans-serif;
     width: 100%;
     height: 100%;
     margin: 0;
     padding: 0;
-    background-color: $bg-color;
+    background-color: $back;
+    color: $txt_1;
+    font-size: $font-size-m;
+}
+h1, h2, h3, h4, h5, h6 {margin: 0; padding: 0;}
+
+h1 {font-size: $font-size-xxl;}
+h2 {
+    font-size: $font-size-xl;font-weight: 300;
+
+    &.subtitle {width: 60%;min-width: 500px;}
+}
+
+.root--container {position: relative;margin: 20px 0 0 20px;}
+
+.home--container {
+    .login-container {
+        width: 300px;
+        margin: 100px auto 0;
+    }
+}
+
+.profile--basicInfo {
+    .basicInfo--name {
+        font-size: $font-size-xxl;
+        font-weight: bold;
+    }
 }
