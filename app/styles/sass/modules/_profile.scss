@@ -1,0 +1,16 @@
+ .profile {
+     .profile--info {
+         .info--name {
+             font-size: $font-size-xl;
+             font-weight: bold;
+         }
+     }
+     .profile--picture {
+         .picture--img {
+             text-align: center;
+             width: 100%;
+             max-width: 400px;
+             border-radius: 200px;
+         }
+     }
+ }
