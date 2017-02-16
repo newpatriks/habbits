@@ -8,8 +8,8 @@ class Picture extends React.Component {
 
     render() {
         return(
-            <div>
-                <img className="" src={this.props.image} />
+            <div className="profile--picture">
+                <img className="picture--img" src={this.props.image} />
             </div>
         );
     }

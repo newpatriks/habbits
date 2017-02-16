@@ -25,8 +25,8 @@ class ProfileInfo extends React.Component {
 
     render() {
         return(
-            <div className="profile--basicInfo">
-                <h2 className="basicInfo--name">Hi {this.state.profile.firstName}! </h2>
+            <div className="profile--info-wrapper">
+                <h2 className="info--name">Hi {this.state.profile.firstName}! </h2>
                 {/* <p>You have a total of {this.state.profile.checkins.count} checkins, cool! </p> */}
             </div>
         );

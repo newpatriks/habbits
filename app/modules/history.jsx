@@ -44,7 +44,7 @@ class History extends React.Component {
                 that.offset+=250;
                 // console.log(allCheckins.length, json.response.checkins.count);
 
-                if (that.offset > 300) {
+                if (that.offset > 200) {
                     // if (json.response.checkins.items.length === 0) {
                     clearInterval(that.state.intervalId);
                     return;
