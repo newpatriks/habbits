@@ -12,65 +12,94 @@ class Profile extends React.Component {
         super(props);
         this.state = {
             token: '',
-            userBio: {
-                friends: {
-                    count: 0
-                },
-                checkins: {
-                    count: 0
-                },
-                tips: ''
-            },
+            friends: 0,
+            tips: 0,
+            checkins: 0,
+            userBio: {},
             profileImg: '',
-            exists: null
+            exists: false
         };
+        this.handleClick = this.handleClick.bind(this); // we need this if we want to use THIS inside handleClick
     }
 
-    componentWillMount() {
-        // get the data?
-        var that = this;
-        this.setState({
-            token: this.props.token
-        });
+    handleClick() {
+        this.synchronyzeCheckins();
+    }
 
+    handleClick() {
+        let that = this;
         let selfService = new Services('https://api.foursquare.com/v2/', this.props.token);
+        selfService.get('users/self')
+            .then(response => response.json())
+            .then(json => {
+                console.log('1');
+                console.log(json.response.user.checkins.count);
+                console.log(that.state.userBio.checkins.count);
+                if (json.response.user.checkins.count > that.state.userBio.checkins.count) {
+                    that.updateStateWithRemoteData(json.response, true);
+                }
+            });
+    }
+
+    updateStateWithRemoteData(data, exists) {
+        let timeSince = this.getAge(new Date(data.user.createdAt*1000));
+        this.setState({
+            foursquareId: data.user.id,
+            exists: exists,
+            checkins: {count: data.user.checkins.count},
+            friends: {count: data.user.friends.count},
+            tips: {count: data.user.tips.count},
+            userBio: data.user,
+            profileImg: data.user.photo.prefix + 'width300' + data.user.photo.suffix,
+            yearsFrom: timeSince[0],
+            monthsFrom: timeSince[1],
+            daysFrom: timeSince[2]
+        });
+    }
+
+    updateStateWithLocalData(data, userId) {
+        let timeSince = this.getAge(new Date(parseInt(data.createdAt)*1000));
+        console.log(data);
+        this.setState({
+            foursquareId: userId,
+            exists: true,
+            checkins: {count: data.checkins.count},
+            friends: {count: data.friends.count},
+            tips: {count: data.tips},
+            userBio: data,
+            profileImg: data.picture,
+            yearsFrom: timeSince[0],
+            monthsFrom: timeSince[1],
+            daysFrom: timeSince[2]
+        });
+    }
+
+
+    updateData() {
+        let that = this;
+        let selfService = new Services('https://api.foursquare.com/v2/', this.props.token);
+
         selfService.get('users/self')
             .then(response => response.json())
             .then(json => {
                 selfService.checkUser(json.response.user.id)
                     .then(res => res.json())
-                    .then(checkUsrResponse => {
-                        // console.log('RESPONSE >> ', checkUsrResponse.data);
-                        if (!checkUsrResponse.data) {
+                    .then(localResponse => {
+                        if (!localResponse.data) {
                             selfService.createUser(json.response.user);
-                            this.setState({
-                                exists: false,
-                                foursquareId: json.response.user.id,
-                                userBio: json.response.user,
-                                profileImg: json.response.user.photo.prefix + 'width300' + json.response.user.photo.suffix,
-                                yearsFrom: that.getNumYears(json.response.user.createdAt),
-                                monthsFrom: that.getNumMonths(json.response.user.createdAt),
-                                daysFrom: that.getNumDays(json.response.user.createdAt)
-                            });
-                        } else if (typeof(checkUsrResponse.data) === 'object') {
-                            console.log(parseInt(checkUsrResponse.data.createdAt));
-                            console.log(new Date(parseInt(checkUsrResponse.data.createdAt)*1000));
-                            let timeSince = that.getAge(new Date(parseInt(checkUsrResponse.data.createdAt)*1000));
-                            this.setState({
-                                foursquareId: json.response.user.id,
-                                exists: true,
-                                userBio: checkUsrResponse.data,
-                                profileImg: checkUsrResponse.data.picture,
-                                yearsFrom: timeSince[0],
-                                monthsFrom: timeSince[1],
-                                daysFrom: timeSince[2]
-                            }, function() {
-                                console.log(this.state);
-                            });
+                            that.updateStateWithRemoteData(json.response, false);
+                        } else if (typeof(localResponse.data) === 'object') {
+                            that.updateStateWithLocalData(localResponse.data, json.response.user.id);
                         }
-
                     });
             });
+    }
+
+    componentWillMount() {
+        // get the data?
+        this.setState({
+            token: this.props.token
+        }, this.updateData);
     }
 
     getAge(fromdate, todate) {
@@ -100,26 +129,19 @@ class Profile extends React.Component {
         if (mdiff> 0) age.push(mdiff);
         if (ddiff> 0) age.push(ddiff);
 
-        console.log('age >> ', age);
-
         return age;
-    }
-
-    getNumYears(seconds) {
-        return new Date(seconds).getFullYear();
-    }
-    getNumMonths(seconds) {
-        return Math.floor((seconds % 31536000) / 2592000);
-    }
-    getNumDays(seconds) {
-        return Math.floor(((seconds % 31536000) % 2592000) / 3600);
     }
 
     render() {
         return(
             <div className="profile container">
                 <div className="row">
-                    <ProfileInfo data={this.state.userBio} />
+                    <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                        <ProfileInfo data={this.state.userBio} />
+                    </div>
+                    <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 text-align--right">
+                        <button className="profile--update-btn" onClick={this.handleClick}>Update checkins</button>
+                    </div>
                 </div>
                 <div className="fullSeparator"></div>
                 <div className="row">
@@ -127,15 +149,15 @@ class Profile extends React.Component {
                         <Picture image={this.state.profileImg} />
                     </div>
                     <div className="col-xs-12 col-sm-9 col-md-9 col-lg-9">
-                        <div class="row">
+                        <div className="row">
                             <div className="profile--stattistics col-xs-4 col-sm-4 col-md-4 col-lg-4 border--right">
-                                <StattisticsSimple number={this.state.userBio.checkins.count} label='Checkins' />
+                                <StattisticsSimple number={this.state.checkins.count} label='Checkins' />
                             </div>
                             <div className="profile--stattistics col-xs-4 col-sm-4 col-md-4 col-lg-4 border--right">
-                                <StattisticsSimple number={this.state.userBio.friends.count} label='Friends' />
+                                <StattisticsSimple number={this.state.friends.count} label='Friends' />
                             </div>
                             <div className="profile--stattistics col-xs-4 col-sm-4 col-md-4 col-lg-4">
-                                <StattisticsSimple number={this.state.userBio.tips} label='Tips' />
+                                <StattisticsSimple number={this.state.tips.count} label='Tips' />
                             </div>
                         </div>
                         <div className="row row--padding--centered">
@@ -151,8 +173,8 @@ class Profile extends React.Component {
                         </div>
                     </div>
                 </div>
-
-                <History token={this.state.token} foursquareId={this.state.foursquareId} exists={this.state.exists}/>
+                <div className="fullSeparator"></div>
+                <History token={this.state.token} foursquareId={this.state.foursquareId} checkinsNum={this.state.checkins.count} exists={this.state.exists}/>
             </div>
         );
     }

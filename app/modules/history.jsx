@@ -13,18 +13,16 @@ class History extends React.Component {
             foursquareId: '',
             token: '',
             categories: {},
+            checkinsNum: 0,
             checkins: {
                 count: 0,
                 items: []
             }
         };
-        this.handleClick = this.handleClick.bind(this); // we need this if we want to use THIS inside handleClick
-    }
-    handleClick() {
-        this.synchronyzeCheckins();
     }
 
     getInfiniteData() {
+        console.log('>> getInfiniteData');
         let itemCheckins = this.state.checkins.items || [],
             that = this,
             allCheckins = [];
@@ -53,46 +51,52 @@ class History extends React.Component {
     }
 
     getLocalUserData() {
+        let that = this;
         this.checkinsService = new Services();
-
-        this.checkinsService.getUserCheckins(this.state.foursquareId)
+        return this.checkinsService.getUserCheckins(this.state.foursquareId)
             .then(response => response.json())
             .then(checkinsJson => {
-                console.log('USER DATA (LOCAL)');
-                console.log(checkinsJson.data);
+                // console.log('USER DATA (LOCAL)');
+                // console.log(checkinsJson.data);
                 console.log('-----------------------------------------');
                 this.setState({
                     checkins: {
                         items: checkinsJson.data,
-                        count: checkinsJson.data.length
+                        count: that.props.checkinsNum
                     }
                 }, this.parseData);
             });
     }
 
     synchronyzeCheckins() {
-        console.log(this.state.checkins.items);
-        let allCheckins = this.state.checkins.items,
-            newestCheckinLocal = allCheckins[0],
-            that = this;
+        this.getLocalUserData()
+            .then(() => {
+                console.log('>> synchronyzeCheckins');
+                let allCheckins = this.state.checkins.items,
+                    newestCheckinLocal = allCheckins[0],
+                    that = this;
 
-        this.checkinsService = new Services('https://api.foursquare.com/v2/', this.props.token);
-        this.checkinsService.get('users/self/checkins','&offset=0&limit=250&afterTimestamp='+newestCheckinLocal.createdAt + 100)
-            .then(response => response.json())
-            .then(json => {
-                let checkinList = json.response.checkins.items;
-                if (checkinList.length > 0) {
-                    // update with new checkins
-                    allCheckins = json.response.checkins.items.concat(allCheckins);
-                    this.checkinsService.update(that.state.foursquareId, allCheckins)
+                console.log(newestCheckinLocal);
+
+                this.checkinsService = new Services('https://api.foursquare.com/v2/', this.props.token);
+                this.checkinsService.get('users/self/checkins','&offset=0&limit=250&afterTimestamp='+newestCheckinLocal.createdAt)
+                .then(response => response.json())
+                .then(json => {
+                    let checkinList = json.response.checkins.items;
+                    if (checkinList.length > 0) {
+                        // update with new checkins
+                        allCheckins = json.response.checkins.items.concat(allCheckins);
+                        this.checkinsService.update(that.state.foursquareId, allCheckins)
                         .then(() => {
                             that.setState({
                                 checkins: allCheckins
                             }, that.parseData);
                         });
-                }
+                    }
 
+                });
             });
+
     }
 
     handlesDataOrigin() {
@@ -100,6 +104,7 @@ class History extends React.Component {
         let intervalId;
 
         if (this.state.exists === false) {
+            console.log('THIS USER DO NOT EXIST!');
             this.checkinsService = new Services('https://api.foursquare.com/v2/', this.props.token);
             this.offset = 0;
             // this.getInfiniteData();
@@ -181,12 +186,16 @@ class History extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         // console.log('>> componentWillReceiveProps', nextProps);
+        let currentCheckinsNum = this.state.checkinsNum;
         this.setState({
             token: nextProps.token,
             foursquareId: nextProps.foursquareId,
-            exists: nextProps.exists
+            exists: nextProps.exists,
+            checkinsNum: nextProps.checkinsNum
         }, function() {
-            if (this.props.exists !== null) {
+            if (currentCheckinsNum !== this.state.checkinsNum) {
+                this.synchronyzeCheckins();
+            } else if (this.props.exists !== null) {
                 this.handlesDataOrigin();
             }
         });
@@ -195,6 +204,8 @@ class History extends React.Component {
     render() {
         return(
             <div>
+                
+
                 {/* <p>Your last checkin was in {this.state.lastPlace} on {this.state.data}, {this.state.monthWord} {this.state.day} of {this.state.year}</p> */}
                 <p>Last checkin was in {this.state.lastPlace} on {this.state.month} {this.state.day}, {this.state.year}</p>
                 <p>First checkin was in {this.state.firstPlace} on {this.state.firstMonth} {this.state.firstDay}, {this.state.firstYear}</p>
@@ -203,7 +214,6 @@ class History extends React.Component {
                     data={[{value: 92-34, label: 'Code lines'}, {value: 34, label: 'Empty lines'}]}
                     categories={this.state.categories}/>
                 </svg>
-                <button onClick={this.handleClick}>Update checkins</button>
             </div>
         );
     }
