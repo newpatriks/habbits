@@ -50,6 +50,12 @@ hr {
 .row.row--padding--centered {
   padding: 0 250px; }
 
+.text-align--left {
+  text-align: left; }
+
+.text-align--right {
+  text-align: right; }
+
 @media (max-width: 1999px) {
   .row.row--padding--centered {
     padding: 0 180px; } }
@@ -58,7 +64,7 @@ hr {
     padding: 0 100px; } }
 @media (max-width: 767px) {
   body {
-    font-size: 10px; }
+    font-size: 12px; }
 
   .row.row--padding--centered {
     padding: 0; } }
@@ -70,6 +76,11 @@ hr {
   width: 100%;
   max-width: 400px;
   border-radius: 200px; }
+.profile .profile--update-btn {
+  padding: 10px 20px;
+  color: #10a5b2;
+  background-color: #f7a173;
+  border: none; }
 
 .stattistics--simple {
   text-align: center;

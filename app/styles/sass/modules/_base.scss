@@ -41,6 +41,9 @@ hr {border-top: 1px solid rgba(255, 255, 255, .3);}
     padding: 0 250px;
 }
 
+.text-align--left {text-align: left;}
+.text-align--right {text-align: right;}
+
 
 
 @media (max-width: 1999px) {
@@ -52,7 +55,7 @@ hr {border-top: 1px solid rgba(255, 255, 255, .3);}
 }
 
 @media (max-width: 767px) {
-    body { font-size: 10px; }
+    body { font-size: 12px; }
     .row.row--padding--centered {padding: 0;}
 }
 
