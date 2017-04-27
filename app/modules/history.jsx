@@ -17,7 +17,8 @@ class History extends React.Component {
             checkins: {
                 count: 0,
                 items: []
-            }
+            },
+            timeline: []
         };
     }
 
@@ -42,7 +43,7 @@ class History extends React.Component {
                 that.offset+=250;
                 // console.log(allCheckins.length, json.response.checkins.count);
 
-                if (that.offset > 200) {
+                if (that.offset > 300) {
                     // if (json.response.checkins.items.length === 0) {
                     clearInterval(that.state.intervalId);
                     return;
@@ -65,6 +66,18 @@ class History extends React.Component {
                         count: that.props.checkinsNum
                     }
                 }, this.parseData);
+            });
+    }
+
+    buildHistoryLineChart() {
+        console.log('buildHistoryLineChart __________________________________');
+        this.service = new Services();
+        this.service.getHistory(this.state.foursquareId)
+            .then(response => response.json())
+            .then(history => {
+                console.log('------------------------------');
+                console.log(history);
+                console.log('------------------------------');
             });
     }
 
@@ -95,8 +108,7 @@ class History extends React.Component {
                     }
 
                 });
-            });
-
+            })
     }
 
     handlesDataOrigin() {
@@ -156,6 +168,23 @@ class History extends React.Component {
                     }
                 });
 
+                // UPDATE TIMELINE DATA
+                let timeline = [];
+                /*
+                [{label: December 2009,value: 5},
+                {label: January 2010,value: 20},
+                {label: February 2010,value: 25},
+                {label: March 2010,value: 23},
+                {label: April 2010,value: 19},
+                {label: May 2010,value: 24}]
+                */
+
+                let checkinsList = this.state.checkins.items;
+                checkinsList.forEach(function(checkin) {
+
+                });
+
+
                 this.setState({
                     lastPlace: lastVenue.name,
                     firstPlace: firstVenue.name,
@@ -193,18 +222,19 @@ class History extends React.Component {
             exists: nextProps.exists,
             checkinsNum: nextProps.checkinsNum
         }, function() {
-            if (currentCheckinsNum !== this.state.checkinsNum) {
+            if (currentCheckinsNum !== this.state.checkinsNum && currentCheckinsNum !== 0) {
                 this.synchronyzeCheckins();
             } else if (this.props.exists !== null) {
                 this.handlesDataOrigin();
             }
+            this.buildHistoryLineChart();
         });
     }
 
     render() {
         return(
             <div>
-                
+
 
                 {/* <p>Your last checkin was in {this.state.lastPlace} on {this.state.data}, {this.state.monthWord} {this.state.day} of {this.state.year}</p> */}
                 <p>Last checkin was in {this.state.lastPlace} on {this.state.month} {this.state.day}, {this.state.year}</p>

@@ -77,21 +77,26 @@ class Profile extends React.Component {
 
     updateData() {
         let that = this;
+        let provisionalUser;
         let selfService = new Services('https://api.foursquare.com/v2/', this.props.token);
 
         selfService.get('users/self')
             .then(response => response.json())
             .then(json => {
-                selfService.checkUser(json.response.user.id)
-                    .then(res => res.json())
-                    .then(localResponse => {
-                        if (!localResponse.data) {
-                            selfService.createUser(json.response.user);
-                            that.updateStateWithRemoteData(json.response, false);
-                        } else if (typeof(localResponse.data) === 'object') {
-                            that.updateStateWithLocalData(localResponse.data, json.response.user.id);
-                        }
-                    });
+                provisionalUser = json.response;
+                return selfService.checkUser(json.response.user.id)
+            })
+            .then(checkUserResponse => checkUserResponse.json())
+            .then(checkUserResponseJson => {
+                console.log('>> 2 >> ', checkUserResponseJson);
+                if (!checkUserResponseJson.data) {
+                    selfService.createUser(provisionalUser.user);
+                    that.updateStateWithRemoteData(provisionalUser, false);
+                } else if (typeof(checkUserResponseJson.data) === 'object') {
+                    that.updateStateWithLocalData(checkUserResponseJson.data, provisionalUser.user.id);
+                } else {
+
+                }
             });
     }
 

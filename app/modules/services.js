@@ -3,6 +3,7 @@ var Services = class Services {
         this.token = token;
         this.foursqApiUrl = url;
         this.apiURL = 'http://localhost:9000/api/';
+        // this.apiURL = 'https://fsq-habits.herokuapp.com/api/';
     }
 
     get(dataSource, attr) {
@@ -41,12 +42,24 @@ var Services = class Services {
         });
     }
 
+    getRequest(URL, method, mode, headers) {
+        return new Request(URL, {
+        	method: method,
+        	mode: mode,
+        	headers: headers || new Headers({})
+        });
+    }
+
+    getHistory(id) {
+        return fetch(this.getRequest(this.apiURL + 'history/' + id, 'GET', 'no-cors'));
+    }
+
     checkUser(id) {
-        return fetch(this.apiURL + 'user/' + id, {method: 'GET'});
+        return fetch(this.getRequest(this.apiURL + 'user/' + id, 'GET', 'no-cors'));
     }
 
     getUserCheckins(id) {
-        return fetch(this.apiURL + 'user-checkins/' + id, {method: 'GET'});
+        return fetch(this.getRequest(this.apiURL + 'user-checkins/' + id, 'GET', 'no-cors'));
     }
 };
 
