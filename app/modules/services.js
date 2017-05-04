@@ -51,16 +51,16 @@ var Services = class Services {
     }
 
     getHistory(id) {
-        return fetch(this.getRequest(this.apiURL + 'history/' + id, 'GET', 'no-cors'));
-    }
+        return fetch(this.getRequest(this.apiURL + 'history/' + id, 'GET', 'cors'));
+    };
 
     checkUser(id) {
-        return fetch(this.getRequest(this.apiURL + 'user/' + id, 'GET', 'no-cors'));
-    }
+        return fetch(this.getRequest(this.apiURL + 'user/' + id, 'GET', 'cors'));
+    };
 
     getUserCheckins(id) {
-        return fetch(this.getRequest(this.apiURL + 'user-checkins/' + id, 'GET', 'no-cors'));
-    }
+        return fetch(this.getRequest(this.apiURL + 'user-checkins/' + id, 'GET', 'cors'));
+    };
 };
 
 export default Services;
