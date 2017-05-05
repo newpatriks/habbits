@@ -70,15 +70,32 @@ class History extends React.Component {
     }
 
     buildHistoryLineChart() {
-        console.log('buildHistoryLineChart __________________________________');
+        var that = this;
         this.service = new Services();
         this.service.getHistory(this.state.foursquareId)
             .then(response => response.json())
             .then(history => {
-                console.log('------------------------------');
-                console.log(history);
-                console.log('------------------------------');
+                console.log(history.data);
+                that.parseSimpleHistoryData(history.data);
             });
+    }
+
+    parseSimpleHistoryData(data) {
+        var globalArr = [];
+        data.forEach(function(currentYearData) {
+            currentYearData.monthTotals.sort(function(a, b) {return a.month > b.month});
+            var year = currentYearData._id.year;
+            var newObj = {}
+            currentYearData.monthTotals.forEach(function(currentMonthObj) {
+                var month = currentMonthObj.month;
+                newObj.date = '1/'+month+year;
+                newObj.size = currentMonthObj.count;
+            });
+            globalArr.push(newObj);
+        });
+        this.setState({
+            timeline: globalArr
+        });
     }
 
     synchronyzeCheckins() {
