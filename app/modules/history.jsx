@@ -1,9 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import d3 from 'd3'
 
 import Services from './services'
 import Piechart from './piechart/piechart.jsx'
+import LineChart from './linechart/linechart.jsx'
 
 class History extends React.Component {
     constructor(props) {
@@ -80,19 +80,35 @@ class History extends React.Component {
             });
     }
 
+    compare(a,b) {
+        if (new Date(a.date) < new Date(b.date))
+            return -1;
+        if (new Date(a.date) > new Date(b.date))
+            return 1;
+
+        return 0;
+    }
+
     parseSimpleHistoryData(data) {
-        var globalArr = [];
-        data.forEach(function(currentYearData) {
-            currentYearData.monthTotals.sort(function(a, b) {return a.month > b.month});
-            var year = currentYearData._id.year;
-            var newObj = {}
-            currentYearData.monthTotals.forEach(function(currentMonthObj) {
-                var month = currentMonthObj.month;
-                newObj.date = '1/'+month+year;
-                newObj.size = currentMonthObj.count;
+        console.log(data);
+        let globalArr = [];
+        let numYears = Object.keys(data);
+        let newObj = {};
+
+        for (let i in data) {
+            let currentYearObject = data[i];
+            let year = currentYearObject._id.year;
+            let monthList = currentYearObject.months;
+            monthList.forEach(function(currentMonthObj) {
+                newObj = {};
+                newObj.date = '1/'+currentMonthObj.month+'/'+year;
+                newObj.value = currentMonthObj.count;
+                globalArr.push(newObj);
             });
-            globalArr.push(newObj);
-        });
+        }
+
+        globalArr = globalArr.sort(this.compare);
+
         this.setState({
             timeline: globalArr
         });
@@ -185,23 +201,6 @@ class History extends React.Component {
                     }
                 });
 
-                // UPDATE TIMELINE DATA
-                let timeline = [];
-                /*
-                [{label: December 2009,value: 5},
-                {label: January 2010,value: 20},
-                {label: February 2010,value: 25},
-                {label: March 2010,value: 23},
-                {label: April 2010,value: 19},
-                {label: May 2010,value: 24}]
-                */
-
-                let checkinsList = this.state.checkins.items;
-                checkinsList.forEach(function(checkin) {
-
-                });
-
-
                 this.setState({
                     lastPlace: lastVenue.name,
                     firstPlace: firstVenue.name,
@@ -249,10 +248,11 @@ class History extends React.Component {
     }
 
     render() {
+        console.log('timeline >> ', this.state.timeline);
         return(
             <div>
 
-
+                <LineChart data={this.state.timeline}/>
                 {/* <p>Your last checkin was in {this.state.lastPlace} on {this.state.data}, {this.state.monthWord} {this.state.day} of {this.state.year}</p> */}
                 <p>Last checkin was in {this.state.lastPlace} on {this.state.month} {this.state.day}, {this.state.year}</p>
                 <p>First checkin was in {this.state.firstPlace} on {this.state.firstMonth} {this.state.firstDay}, {this.state.firstYear}</p>

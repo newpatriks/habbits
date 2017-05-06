@@ -59,7 +59,7 @@ class Profile extends React.Component {
 
     updateStateWithLocalData(data, userId) {
         let timeSince = this.getAge(new Date(parseInt(data.createdAt)*1000));
-        console.log(data);
+        
         this.setState({
             foursquareId: userId,
             exists: true,
