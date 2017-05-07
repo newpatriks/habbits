@@ -23,7 +23,7 @@ class History extends React.Component {
     }
 
     getInfiniteData() {
-        console.log('>> getInfiniteData');
+        // console.log('>> getInfiniteData');
         let itemCheckins = this.state.checkins.items || [],
             that = this,
             allCheckins = [];
@@ -43,7 +43,7 @@ class History extends React.Component {
                 that.offset+=250;
                 // console.log(allCheckins.length, json.response.checkins.count);
 
-                if (that.offset > 300) {
+                if (that.offset > 3000) {
                     // if (json.response.checkins.items.length === 0) {
                     clearInterval(that.state.intervalId);
                     return;
@@ -59,7 +59,7 @@ class History extends React.Component {
             .then(checkinsJson => {
                 // console.log('USER DATA (LOCAL)');
                 // console.log(checkinsJson.data);
-                console.log('-----------------------------------------');
+                // console.log('-----------------------------------------');
                 this.setState({
                     checkins: {
                         items: checkinsJson.data,
@@ -75,7 +75,6 @@ class History extends React.Component {
         this.service.getHistory(this.state.foursquareId)
             .then(response => response.json())
             .then(history => {
-                console.log(history.data);
                 that.parseSimpleHistoryData(history.data);
             });
     }
@@ -90,7 +89,7 @@ class History extends React.Component {
     }
 
     parseSimpleHistoryData(data) {
-        console.log(data);
+        // console.log(data);
         let globalArr = [];
         let numYears = Object.keys(data);
         let newObj = {};
@@ -248,11 +247,10 @@ class History extends React.Component {
     }
 
     render() {
-        console.log('timeline >> ', this.state.timeline);
+        // console.log('timeline >> ', this.state.timeline);
         return(
             <div>
-
-                <LineChart data={this.state.timeline}/>
+                <LineChart data={this.state.timeline} width={1000}/>
                 {/* <p>Your last checkin was in {this.state.lastPlace} on {this.state.data}, {this.state.monthWord} {this.state.day} of {this.state.year}</p> */}
                 <p>Last checkin was in {this.state.lastPlace} on {this.state.month} {this.state.day}, {this.state.year}</p>
                 <p>First checkin was in {this.state.firstPlace} on {this.state.firstMonth} {this.state.firstDay}, {this.state.firstYear}</p>

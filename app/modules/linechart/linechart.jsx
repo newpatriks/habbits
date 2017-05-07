@@ -2,15 +2,25 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import * as d3 from 'd3'
 
-console.log(d3);
+// console.log(d3);
 
 class LineChart extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            width: this.props.width
+            width: this.props.width,
+            yearList: []
         }
     }
+
+    componentWillReceiveProps(nextProps) {
+        let that = this;
+        this.setState({
+            width: nextProps.width,
+            data: nextProps.data
+        });
+    }
+
     render() {
         let data = this.props.data;
 
@@ -24,6 +34,15 @@ class LineChart extends React.Component {
             d.date = parseDate(d.date);
             d.value = parseInt(d.value);
         });
+
+        let yearList = [];
+        for (let i = 0; i < data.length; i++) {
+            let currentDate = data[i].date;
+            let year = currentDate.getFullYear();
+            if (yearList.indexOf(year) === -1) {
+                yearList.push(year);
+            }
+        }
 
         let x = d3.scaleTime()
             .domain(d3.extent(data, function(d) { return d.date; }))
@@ -40,10 +59,23 @@ class LineChart extends React.Component {
 
         let transform='translate(' + margin.left + ',' + margin.top + ')';
 
+        // GENERATE VERTICAL LINES ------
+        let miniComponents;
+        if (yearList.length > 0) {
+            miniComponents = yearList.map(function(itemData) {
+                let date = parseDate('1/1/'+itemData);
+                let linePoints = [{'date': date, 'value': 0}, {'date': date, 'value': h}];
+                return <path className="line--vertical" key={itemData} className="line shadow" d={line(linePoints)} strokeLinecap="round"/>
+            });
+        }
+        // -------------------------------
+
+
         return (
             <div>
                 <svg id={this.props.chartId} width={this.state.width} height={this.props.height}>
                     <g transform={transform}>
+                        <g className="vertical-lines--container">{miniComponents}</g>
                         <path className="line shadow" d={line(data)} strokeLinecap="round"/>
                     </g>
                 </svg>
@@ -54,7 +86,7 @@ class LineChart extends React.Component {
 
 LineChart.defaultProps = {
     width: 800,
-    height: 250,
+    height: 200,
     chartId: 'histogram'
 };
 

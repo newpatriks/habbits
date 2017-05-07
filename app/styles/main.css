@@ -99,7 +99,13 @@ hr {
 
 .line {
   fill: none;
-  stroke: steelblue;
+  stroke: #f7a173;
   stroke-width: 2px; }
+
+.vertical-lines--container .line {
+  fill: none;
+  stroke: #f8f6f1;
+  stroke-dasharray: 5;
+  stroke-width: .5px; }
 
 /*# sourceMappingURL=main.css.map */

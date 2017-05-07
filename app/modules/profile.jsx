@@ -32,9 +32,6 @@ class Profile extends React.Component {
         selfService.get('users/self')
             .then(response => response.json())
             .then(json => {
-                console.log('1');
-                console.log(json.response.user.checkins.count);
-                console.log(that.state.userBio.checkins.count);
                 if (json.response.user.checkins.count > that.state.userBio.checkins.count) {
                     that.updateStateWithRemoteData(json.response, true);
                 }
@@ -59,7 +56,7 @@ class Profile extends React.Component {
 
     updateStateWithLocalData(data, userId) {
         let timeSince = this.getAge(new Date(parseInt(data.createdAt)*1000));
-        
+
         this.setState({
             foursquareId: userId,
             exists: true,

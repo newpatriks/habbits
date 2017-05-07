@@ -1,5 +1,14 @@
 .line {
     fill: none;
-    stroke: steelblue;
+    stroke: $color5;
     stroke-width: 2px;
+}
+
+.vertical-lines--container {
+    .line {
+        fill: none;
+        stroke: $color3;
+        stroke-dasharray: 5;
+        stroke-width: .5px;
+    }
 }
