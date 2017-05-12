@@ -108,4 +108,10 @@ hr {
   stroke-dasharray: 5;
   stroke-width: .5px; }
 
+.sneak circle {
+  stroke: #b7e3fa;
+  stroke-width: 3;
+  fill: #b7e3fa;
+  stroke-linecap: round; }
+
 /*# sourceMappingURL=main.css.map */

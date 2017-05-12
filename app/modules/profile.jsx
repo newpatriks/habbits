@@ -88,6 +88,7 @@ class Profile extends React.Component {
             .then(responseJSON => {
                 data.checkUser = responseJSON;
                 if (!data.checkUser.data) {
+
                     selfService.createUser(data.profile.user);
                     that.updateStateWithRemoteData(data.profile, false);
                 } else if (typeof(data.checkUser.data) === 'object') {

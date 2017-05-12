@@ -17,8 +17,7 @@ class History extends React.Component {
             checkins: {
                 count: 0,
                 items: []
-            },
-            timeline: []
+            }
         };
     }
 
@@ -67,50 +66,6 @@ class History extends React.Component {
                     }
                 }, this.parseData);
             });
-    }
-
-    buildHistoryLineChart() {
-        var that = this;
-        this.service = new Services();
-        this.service.getHistory(this.state.foursquareId)
-            .then(response => response.json())
-            .then(history => {
-                that.parseSimpleHistoryData(history.data);
-            });
-    }
-
-    compare(a,b) {
-        if (new Date(a.date) < new Date(b.date))
-            return -1;
-        if (new Date(a.date) > new Date(b.date))
-            return 1;
-
-        return 0;
-    }
-
-    parseSimpleHistoryData(data) {
-        // console.log(data);
-        let globalArr = [];
-        let numYears = Object.keys(data);
-        let newObj = {};
-
-        for (let i in data) {
-            let currentYearObject = data[i];
-            let year = currentYearObject._id.year;
-            let monthList = currentYearObject.months;
-            monthList.forEach(function(currentMonthObj) {
-                newObj = {};
-                newObj.date = '1/'+currentMonthObj.month+'/'+year;
-                newObj.value = currentMonthObj.count;
-                globalArr.push(newObj);
-            });
-        }
-
-        globalArr = globalArr.sort(this.compare);
-
-        this.setState({
-            timeline: globalArr
-        });
     }
 
     synchronyzeCheckins() {
@@ -180,6 +135,7 @@ class History extends React.Component {
                 let lastVenue = lastCheckin.venue;
                 let lastCheckinDate = new Date(0);
                 let firstCheckinDate = new Date(0);
+
                 lastCheckinDate.setUTCSeconds(lastCheckin.createdAt);
                 firstCheckinDate.setUTCSeconds(firstCheckin.createdAt);
 
@@ -242,7 +198,7 @@ class History extends React.Component {
             } else if (this.props.exists !== null) {
                 this.handlesDataOrigin();
             }
-            this.buildHistoryLineChart();
+            // this.buildHistoryLineChart();
         });
     }
 
@@ -250,15 +206,16 @@ class History extends React.Component {
         // console.log('timeline >> ', this.state.timeline);
         return(
             <div>
-                <LineChart data={this.state.timeline} width={1000}/>
+                <LineChart firstCheckinVenue={this.state.firstPlace} lastCheckinVenue={this.state.lastPlace} width={1100} foursquareId={this.state.foursquareId} />
                 {/* <p>Your last checkin was in {this.state.lastPlace} on {this.state.data}, {this.state.monthWord} {this.state.day} of {this.state.year}</p> */}
-                <p>Last checkin was in {this.state.lastPlace} on {this.state.month} {this.state.day}, {this.state.year}</p>
+                {/* <p>Last checkin was in {this.state.lastPlace} on {this.state.month} {this.state.day}, {this.state.year}</p>
                 <p>First checkin was in {this.state.firstPlace} on {this.state.firstMonth} {this.state.firstDay}, {this.state.firstYear}</p>
                 <svg width={800} height={400}>
                     <Piechart x={300} y={100} outerRadius={100} innerRadius={50}
-                    data={[{value: 92-34, label: 'Code lines'}, {value: 34, label: 'Empty lines'}]}
-                    categories={this.state.categories}/>
-                </svg>
+                        data={[{value: 92-34, label: 'Code lines'}, {value: 34, label: 'Empty lines'}]}
+                        categories={this.state.categories}
+                    />
+                </svg> */}
             </div>
         );
     }

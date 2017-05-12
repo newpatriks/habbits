@@ -12,3 +12,12 @@
         stroke-width: .5px;
     }
 }
+
+.sneak {
+    circle {
+        stroke: $txt_1;
+        stroke-width: 3;
+        fill: $txt_1;
+        stroke-linecap: round;
+    }
+}
